@@ -6,13 +6,18 @@
                 <el-aside width="200px"></el-aside>
                 <el-container>
                     <el-main>
-                        <!-- <ul v-infinite-scroll="load" class="infinite-list" style="overflow: auto">
-                            <li v-for="i in inputList" :key="i" class="infinite-list-item">{{ i }}</li>
-                        </ul> -->
-                        <div v-for="(input) in inputList" :key="input.id">
-                            <el-text>{{ input }}</el-text>
-                            <br>
-                        </div>
+                        <el-form ref="formRef" :model="dynamicValidateForm" label-width="120px" class="demo-dynamic">
+                            <el-form-item v-for="(domain, index) in dynamicValidateForm.domains" :key="domain.key" :label="'问题' + (index+1)" :prop="'domains.' + index + '.value'" :rules="{
+      }">
+                                {{ domain.question }}？
+                                <el-divider />
+                                <div>
+                                    <text v-for="(as,asIndex) in domain.answer" :key="asIndex">
+                                        {{as}}
+                                    </text>
+                                </div>
+                            </el-form-item>
+                        </el-form>
                     </el-main>
                     <el-footer>
                         <el-form :model="questionForm">
@@ -31,15 +36,17 @@
   
 
   <script  setup>
-import { ref } from "vue";
+import { onMounted, ref, reactive } from "vue";
 import request from "@/js/request";
+import axios from "axios";
+import { ElNotification } from "element-plus";
 
+const socket = new WebSocket("ws://127.0.0.1:8081/v1/conversation");
+const dynamicValidateForm = reactive({
+    domains: [],
+    email: "",
+});
 const inputList = ref([]);
-
-// const count = ref(10);
-// // const load = () => {
-// //     count.value += 2;
-// // };
 
 const questionForm = ref({
     content: "",
@@ -47,21 +54,39 @@ const questionForm = ref({
 
 const onSubmit = () => {
     // inputList.value.push({ name: `输入框${inputList.value.length + 1}`, id: `input-${inputList.value.length + 1}` });
-    const question= "问：" + questionForm.value.content
-    inputList.value.push(question);
-    inputList.value.push("AI 回答中....");
 
-    
-    request
-        .post("http://localhost:8081/v1/question", questionForm.value)
-        .then((response) => {
-            const answer ="答："+response.data
-            inputList.value.push(answer);
-        })
-        .catch((error) => {
-            console.error(error);
-        });
+    // inputList.value.push(question);
+    // inputList.value.push("AI 回答中....");
+    socket.send(questionForm.value.content);
+    dynamicValidateForm.domains.push({
+        question: questionForm.value.content,
+        answer: [],
+    });
 };
+
+const getMessage = () => {
+    socket.onmessage = function (e) {
+        console.log(e.data);
+        console.log();
+        dynamicValidateForm.domains[
+            dynamicValidateForm.domains.length - 1
+        ].answer.push(e.data);
+    };
+};
+
+const onOpen = () => {
+    socket.onopen = function (e) {
+        ElNotification({
+            title: "Socket",
+            message: "已连接",
+        });
+    };
+};
+
+onMounted(() => {
+    getMessage();
+    onOpen();
+});
 </script>
 
 
