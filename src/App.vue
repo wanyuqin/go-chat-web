@@ -1,34 +1,37 @@
 <template>
-  <!-- <HelloWorld msg="Welcome to Your Vue.js App"/> -->
-<Terminal></Terminal>
+<Chat></Chat>
 </template>
 
 <script>
-import Terminal from './components/Terminal.vue';
-
+import Chat from './components/ChatVue.vue';
 export default {
   name: 'App',
   components: {
-     Terminal
+    Chat
   }
 }
 </script>
 
 <style>
-/* #app {
+#app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
+  /* -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px; */
-/* } */
+  margin-top: 60px;  */
+  /* height: 100vh; */
+}
+/* .common-layout{
+  height: 100vh;
+} */
 
-.container {
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.el-container{
+  height: 90vh
+}
+
+.el-main{
+  height: 100vh;
 }
 
 </style>
