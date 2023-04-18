@@ -27,11 +27,21 @@ export default {
 } */
 
 .el-container{
-  height: 90vh
+  height: 85vh
 }
 
 .el-main{
-  height: 100vh;
+  height: 50vh;
 }
+
+.el-footer {
+  height: 50vh;
+}
+
+
+::-webkit-scrollbar {
+  display: none;
+}
+
 
 </style>
